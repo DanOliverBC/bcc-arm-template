@@ -1,0 +1,231 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "site_name": {
+            "type": "String",
+            "metadata": {
+                "description": "Site name -- use lower case with dashes"
+            }
+        },
+        "environment": {
+            "type": "string",
+            "metadata": {
+                "description": "Select an environment to deploy into"
+            },
+            "allowedValues": [
+                "Development",
+                "Test",
+                "Production"
+            ],
+            "defaultValue": "Development"
+        },
+        "runtime": {
+            "type": "string",
+            "metadata": {
+                "description": "This is the language used by the container.  For all available options use the command az webapp list-runtimes --linux.  Common ones for us: JAVA|8-jre, JAVA|11-java11, NODE|12.9, TOMCAT|9.0-java11, DOTNETCORE|3.1"
+            },
+            "defaultValue": "JAVA|8-jre"
+        },
+        "startup_command": {
+            "type": "string",
+            "metadata": {
+                "description": "The command to run against the docker container to start your app."
+            },
+            "defaultValue": "java -jar /home/site/wwwroot/app.jar --server.port=80"
+        },
+        "dev_vnet_subnet_url": {
+            "type": "string",
+            "metadata": {
+                "description": "The url of the subnet for the DEVELOPMENT virtual network"
+            },
+            "defaultValue": "/subscriptions/58bb2502-ca4d-47a0-8a5e-0265e29f6d5b/resourceGroups/Network_Services_Dev/providers/Microsoft.Network/virtualNetworks/BC_DevTest_IAAS_Network_Services/subnets/BC_WP_DevTest_RailTracing"
+        },
+        "test_vnet_subnet_url": {
+            "type": "string",
+            "metadata": {
+                "description": "The url of the subnet for the TEST virtual network"
+            },
+            "defaultValue": "/subscriptions/58bb2502-ca4d-47a0-8a5e-0265e29f6d5b/resourceGroups/Network_Services_Dev/providers/Microsoft.Network/virtualNetworks/BC_DevTest_IAAS_Network_Services/subnets/BC_WP_DevTest_RailTracing"
+        },
+        "prod_vnet_subnet_url": {
+            "type": "string",
+            "metadata": {
+                "description": "The url of the subnet for the PRODUCTION virtual network"
+            },
+            "defaultValue": "/subscriptions/58bb2502-ca4d-47a0-8a5e-0265e29f6d5b/resourceGroups/Network_Services_Dev/providers/Microsoft.Network/virtualNetworks/BC_DevTest_IAAS_Network_Services/subnets/BC_WP_DevTest_RailTracing"
+        },
+        "dev_serverfarm_url": {
+            "type": "string",
+            "metadata": {
+                "description": "The server farm url to use for the DEVELOPMENT environment"
+            },
+            "defaultValue": "/subscriptions/58bb2502-ca4d-47a0-8a5e-0265e29f6d5b/resourceGroups/Dev_Services_Test/providers/Microsoft.Web/serverfarms/ASP-DevServicesTest-bbde"
+        },
+        "test_serverfarm_url": {
+            "type": "string",
+            "metadata": {
+                "description": "The server farm url to use for the TEST environment"
+            },
+            "defaultValue": "/subscriptions/58bb2502-ca4d-47a0-8a5e-0265e29f6d5b/resourceGroups/Dev_Services_Test/providers/Microsoft.Web/serverfarms/ASP-DevServicesTest-bbde"
+        },
+        "prod_serverfarm_url": {
+            "type": "string",
+            "metadata": {
+                "description": "The server farm url to use for the PRODUCTION environment"
+            },
+            "defaultValue": "/subscriptions/58bb2502-ca4d-47a0-8a5e-0265e29f6d5b/resourceGroups/Dev_Services_Test/providers/Microsoft.Web/serverfarms/ASP-DevServicesTest-bbde"
+        }
+    },
+    "variables": {
+        // Figures out serverfarm url whether it is dev, test, or prod
+        "serverfarm_url": "[
+            if(equals(parameters('environment'), 'Development'), parameters('dev_serverfarm_url'), 
+            if (equals(parameters('environment'), 'Test'), parameters('test_serverfarm_url'), 
+            parameters('prod_serverfarm_url')))]",
+        // Figures out vnet_subnet_url whether it is dev, test, or prod
+        "vnet_subnet_url": "[
+            if(equals(parameters('environment'), 'Development'), parameters('dev_vnet_subnet_url'), 
+            if (equals(parameters('environment'), 'Test'), parameters('test_vnet_subnet_url'), 
+            parameters('prod_vnet_subnet_url')))]",
+        "vnet_unique_name": "[uniqueString(deployment().name)]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2018-11-01",
+            "name": "[parameters('site_name')]",
+            "location": "West US 2",
+            "kind": "app,linux",
+            "properties": {
+                "enabled": true,
+                "hostNameSslStates": [
+                    {
+                        "name": "[concat(parameters('site_name'), '.azurewebsites.net')]",
+                        "sslState": "Disabled",
+                        "hostType": "Standard"
+                    },
+                    {
+                        "name": "[concat(parameters('site_name'), '.scm.azurewebsites.net')]",
+                        "sslState": "Disabled",
+                        "hostType": "Repository"
+                    }
+                ],
+                "serverFarmId": "[variables('serverfarm_url')]",
+                "reserved": true,
+                "isXenon": false,
+                "hyperV": false,
+                "siteConfig": {},
+                "scmSiteAlsoStopped": false,
+                "clientAffinityEnabled": false,
+                "clientCertEnabled": false,
+                "hostNamesDisabled": false,
+                "containerSize": 0,
+                "dailyMemoryTimeQuota": 0,
+                "httpsOnly": true,
+                "redundancyMode": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/config",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('site_name'), '/web')]",
+            "location": "West US 2",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('site_name'))]"
+            ],
+            "properties": {
+                "numberOfWorkers": 1,
+                "defaultDocuments": [
+                    "Default.htm",
+                    "Default.html",
+                    "Default.asp",
+                    "index.htm",
+                    "index.html",
+                    "iisstart.htm",
+                    "default.aspx",
+                    "index.php",
+                    "hostingstart.html"
+                ],
+                "netFrameworkVersion": "v4.0",
+                "linuxFxVersion": "[parameters('runtime')]",
+                "requestTracingEnabled": false,
+                "remoteDebuggingEnabled": false,
+                "remoteDebuggingVersion": "VS2019",
+                "httpLoggingEnabled": true,
+                "logsDirectorySizeLimit": 35,
+                "detailedErrorLoggingEnabled": false,
+                "publishingUsername": "[concat('$', parameters('site_name'))]",
+                "scmType": "VSTSRM",
+                "use32BitWorkerProcess": true,
+                "webSocketsEnabled": false,
+                "alwaysOn": true,
+                "appCommandLine": "[parameters('startup_command')]",
+                "managedPipelineMode": "Integrated",
+                "virtualApplications": [
+                    {
+                        "virtualPath": "/",
+                        "physicalPath": "site\\wwwroot",
+                        "preloadEnabled": true
+                    }
+                ],
+                "loadBalancing": "LeastRequests",
+                "experiments": {
+                    "rampUpRules": []
+                },
+                "autoHealEnabled": false,
+                "vnetName": "[variables('vnet_unique_name')]",
+                "localMySqlEnabled": false,
+                "ipSecurityRestrictions": [
+                    {
+                        "ipAddress": "Any",
+                        "action": "Allow",
+                        "priority": 1,
+                        "name": "Allow all",
+                        "description": "Allow all access"
+                    }
+                ],
+                "scmIpSecurityRestrictions": [
+                    {
+                        "ipAddress": "Any",
+                        "action": "Allow",
+                        "priority": 1,
+                        "name": "Allow all",
+                        "description": "Allow all access"
+                    }
+                ],
+                "scmIpSecurityRestrictionsUseMain": false,
+                "http20Enabled": false,
+                "minTlsVersion": "1.2",
+                "ftpsState": "AllAllowed",
+                "reservedInstanceCount": 0
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/hostNameBindings",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('site_name'), '/', parameters('site_name'), '.azurewebsites.net')]",
+            "location": "West US 2",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('site_name'))]"
+            ],
+            "properties": {
+                "siteName": "[parameters('site_name')]",
+                "hostNameType": "Verified"
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/virtualNetworkConnections",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('site_name'), '/', variables('vnet_unique_name'))]",
+            "location": "West US 2",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('site_name'))]"
+            ],
+            "properties": {
+                "vnetResourceId": "[variables('vnet_subnet_url')]",
+                "isSwift": true
+            }
+        }
+    ]
+}
