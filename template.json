@@ -80,14 +80,14 @@
     "variables": {
         // Figures out serverfarm url whether it is dev, test, or prod
         "serverfarm_url": "[
-            if(equals(parameters('environment'), 'Development'), parameters('dev_serverfarm_url'), 
+            if(equals(parameters('environment'), 'Production'), parameters('prod_serverfarm_url'), 
             if (equals(parameters('environment'), 'Test'), parameters('test_serverfarm_url'), 
-            parameters('prod_serverfarm_url')))]",
+            parameters('dev_serverfarm_url')))]",
         // Figures out vnet_subnet_url whether it is dev, test, or prod
         "vnet_subnet_url": "[
-            if(equals(parameters('environment'), 'Development'), parameters('dev_vnet_subnet_url'), 
+            if(equals(parameters('environment'), 'Production'), parameters('prod_vnet_subnet_url'), 
             if (equals(parameters('environment'), 'Test'), parameters('test_vnet_subnet_url'), 
-            parameters('prod_vnet_subnet_url')))]",
+            parameters('dev_vnet_subnet_url')))]",
         "vnet_unique_name": "[uniqueString(deployment().name)]"
     },
     "resources": [
