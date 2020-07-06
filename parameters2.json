@@ -8,6 +8,9 @@
     "serverFarmName": {
       "value": "ASP-DevServicesTest-bbde"
     },
+    "vNetResourceGroupName": {
+      "value": "Network_Services_Dev"
+    },
     "vNetName": {
       "value": "BC_DevTest_IAAS_Network_Services"
     },

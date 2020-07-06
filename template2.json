@@ -14,6 +14,13 @@
                 "description": "The name of the server farm"
             }
         },
+        "vNetResourceGroupName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the virtual network resource group name, if different"
+            },
+            "defaultValue": "[resourceGroup().name]"
+        },
         "vNetName": {
             "type": "string",
             "metadata": {
@@ -39,11 +46,11 @@
         "virtualNetwork": "[
             if(
                 empty(parameters('vNetSubnetName')), 
-                resourceId('Microsoft.Network/virtualNetworks', parameters('vNetName')),
-                resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vNetName'), parameters('vNetSubnetName'))
+                resourceId(subscription().subscriptionId, parameters('vNetResourceGroupName'), 'Microsoft.Network/virtualNetworks', parameters('vNetName')),
+                resourceId(subscription().subscriptionId, parameters('vNetResourceGroupName'), 'Microsoft.Network/virtualNetworks/subnets', parameters('vNetName'), parameters('vNetSubnetName'))
             )
         ]",
-        "uniqueVnetName": "[concat(uniqueString(resourceGroup().id, deployment().name), parameters('vNetName'))]"
+        "uniqueVnetName": "[concat(uniqueString(parameters('vNetResourceGroupName'), deployment().name), parameters('vNetName'))]"
 
     },
     "resources": [
