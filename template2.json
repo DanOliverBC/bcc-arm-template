@@ -29,9 +29,9 @@
         "runtime": {
             "type": "string",
             "metadata": {
-                "description": "This is the language used by the container.  For all available options use the command az webapp list-runtimes --linux.  Common ones for us: JAVA|8-jre, JAVA|11-java11, NODE|12.9, TOMCAT|9.0-java11, DOTNETCORE|3.1"
+                "description": "This is the language used by the container.  For all available options use the command az webapp list-runtimes --linux.  Common ones for us: JAVA|8-jre8, JAVA|11-java11, NODE|12.9, TOMCAT|9.0-java11, DOTNETCORE|3.1"
             },
-            "defaultValue": "JAVA|8-jre"
+            "defaultValue": "JAVA|8-jre8"
         }
     },
     "variables": {
