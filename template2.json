@@ -183,8 +183,7 @@
                 "[resourceId('Microsoft.Web/sites', parameters('siteName'))]"
             ],
             "properties": {
-                "vnetResourceId": "[variables('virtualNetwork')]",
-                "isSwift": true
+                "vnetResourceId": "[variables('virtualNetwork')]"
             }
         }
     ]
