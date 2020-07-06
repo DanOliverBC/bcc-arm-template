@@ -110,7 +110,6 @@
                     "index.php",
                     "hostingstart.html"
                 ],
-                "netFrameworkVersion": "v4.0",
                 "linuxFxVersion": "[parameters('runtime')]",
                 "requestTracingEnabled": false,
                 "remoteDebuggingEnabled": false,
@@ -138,7 +137,6 @@
                 },
                 "autoHealEnabled": false,
                 "vnetName": "[variables('uniqueVnetName')]",
-                "localMySqlEnabled": false,
                 "ipSecurityRestrictions": [
                     {
                         "ipAddress": "Any",
@@ -158,7 +156,6 @@
                     }
                 ],
                 "scmIpSecurityRestrictionsUseMain": false,
-                "http20Enabled": false,
                 "minTlsVersion": "1.2",
                 "ftpsState": "AllAllowed",
                 "reservedInstanceCount": 0
