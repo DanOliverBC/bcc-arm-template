@@ -50,7 +50,7 @@
                 resourceId(subscription().subscriptionId, parameters('vNetResourceGroupName'), 'Microsoft.Network/virtualNetworks/subnets', parameters('vNetName'), parameters('vNetSubnetName'))
             )
         ]",
-        "uniqueVnetName": "[concat(uniqueString(parameters('vNetResourceGroupName'), deployment().name), parameters('vNetName'))]"
+        "uniqueVnetName": "[concat(uniqueString(parameters('vNetResourceGroupName'), parameters('siteName')), parameters('vNetName'))]"
 
     },
     "resources": [
