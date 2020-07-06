@@ -1,0 +1,18 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "siteName": {
+      "value": "rail-tracing"
+    },
+    "serverFarmName": {
+      "value": "ASP-DevServicesTest-bbde"
+    },
+    "vNetName": {
+      "value": "BC_DevTest_IAAS_Network_Services"
+    },
+    "vNetSubnetName": {
+      "value": "BC_WP_DevTest_RailTracing"
+    }
+  }
+}
