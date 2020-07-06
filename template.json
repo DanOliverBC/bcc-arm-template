@@ -223,8 +223,7 @@
                 "[resourceId('Microsoft.Web/sites', parameters('site_name'))]"
             ],
             "properties": {
-                "vnetResourceId": "[variables('vnet_subnet_url')]",
-                "isSwift": true
+                "vnetResourceId": "[variables('vnet_subnet_url')]"
             }
         }
     ]
