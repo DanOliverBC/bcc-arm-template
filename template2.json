@@ -175,15 +175,15 @@
             }
         },
         {
-            "type": "Microsoft.Web/sites/virtualNetworkConnections",
+            "type": "Microsoft.Web/sites/networkConfig",
             "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('siteName'), '/', parameters('vNetName'))]",
+            "name": "[concat(parameters('siteName'), '/VirtualNetwork')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Web/sites', parameters('siteName'))]"
             ],
             "properties": {
-                "vnetResourceId": "[variables('virtualNetwork')]"
+                "subnetResourceId": "[variables('virtualNetwork')]"
             }
         }
     ]
